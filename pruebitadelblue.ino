@@ -10,7 +10,7 @@
 Servo servo;
 String device_name = "ESP32EDU ";
 int pinServo = 4;
-char caracter[5];
+char caracter[3];
 int leer(int x,int y,int z);
 
 // Check if Bluetooth is available
@@ -31,9 +31,14 @@ void setup() {
   SerialBT.begin(device_name);  //Bluetooth device name
   //SerialBT.deleteAllBondedDevices(); // Uncomment this to delete paired devices; Must be called after begin
   Serial.printf("The device with name \"%s\" is started.\nNow you can pair it with Bluetooth!\n", device_name.c_str());
+  Serial.begin(9600);
 }
 
 void loop() {
+  girar();
+  Serial.println("Caracter:");
+
+  Serial.println(caracter);
   if (Serial.available()) {
     SerialBT.write(Serial.read());
   }
@@ -44,34 +49,34 @@ void loop() {
   }
   Serial.println(caracter);
   }
-  if (caracter[0]=='0'){
-servo.write (0);
-Serial.println("AL");
-}
-if ( (caracter[0]=='1')&&(caracter[1]== '2')&&(caracter[2]== '0')){
-servo.write(120);
   
-  Serial.println("GO");
 }
-  if (caracter[0]=='6'){
-servo.write (60);
-Serial.println("BRUJE");
-}
-if ( (caracter[0]=='3')&&(caracter[1]== '0')){
-servo.write(30);
-  
-  Serial.println("JE");
-}
-}
-void girar(char x[3]){
+void girar(){
   int centena = 0;
   int decena = 0;
   int unidad = 0;
   int grados = 0;
-  unidad = x[2];
-  decena = x[1];
-  centena = x[0];
-  grados = unidad + (decena*10) + (centena*100);
-  Serial.println(grados);
+  centena = caracter[0]-48;
+  decena = caracter[1]-48;
+  unidad = caracter[2]-48;
+  if(unidad == 207 && decena != 207){
+    unidad = decena;
+    decena = centena;
+    centena = 0;
+  }
+  if (decena == 207 && decena == 207){
+    unidad = centena;
+    centena = 0;
+    decena = 0;
+  }
+  grados = (unidad + decena*10 + centena*100);
   servo.write(grados);
+  Serial.print("unidad:");
+  Serial.println(unidad);
+  Serial.print("decena:");
+  Serial.println(decena);
+  Serial.print("centena:");
+  Serial.println(centena);
+  Serial.println(grados);
+  delay(1000);
 }
